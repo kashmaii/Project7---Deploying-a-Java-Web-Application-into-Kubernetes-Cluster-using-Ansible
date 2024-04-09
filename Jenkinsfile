@@ -45,14 +45,9 @@ pipeline {
 }
 
 def deployToTomcat(Map params) {
-    deploy adapters: [
-        tomcat9 (
-            credentialsId: params.credentialsId,
-            path: params.path ?: '',
-            url: params.url
-        )
-    ],
-    contextPath: params.contextPath,
-    onFailure: params.onFailure ?: 'false',
-    war: params.war
+    withCredentials([usernamePassword(credentialsId: params.credentialsId, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+        sh """
+            curl -T ${params.war} http://${USERNAME}:${PASSWORD}@${params.url}/manager/text/deploy?path=/${params.contextPath}
+        """
+    }
 }
