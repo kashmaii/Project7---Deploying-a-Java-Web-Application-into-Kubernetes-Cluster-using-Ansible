@@ -30,15 +30,7 @@ pipeline {
                 branch 'main'
             }
             steps {
-                script {
-                    echo "Deploy stage"
-                    deployToTomcat(
-                        credentialsId: 'tomcat_deploy_credentials',
-                        url: 'http://57.151.123.161:8080/',
-                        contextPath: 'test',
-                        war: '**/*.war'
-                    )
-                }
+                deployToTomcat(credentialsId: 'tomcat_deploy_credentials', url: 'http://57.151.123.161:8080/', contextPath: 'test', war: '**/*.war')
             }
         }
     }
