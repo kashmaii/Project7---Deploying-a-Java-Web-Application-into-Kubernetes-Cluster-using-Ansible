@@ -30,17 +30,29 @@ pipeline {
                 branch 'main'
             }
             steps {
-            echo "deploy stage"
-            deploy adapters: [tomcat9 (
-                    credentialsId: 'tomcat_deploy_credentials',
-                    path: '',
-                    url: 'http://57.151.123.161:8080/'
-                )],
-                contextPath: 'test',
-                onFailure: 'false',
-                war: '**/*.war'
-        }
-
+                script {
+                    echo "Deploy stage"
+                    deployToTomcat(
+                        credentialsId: 'tomcat_deploy_credentials',
+                        url: 'http://57.151.123.161:8080/',
+                        contextPath: 'test',
+                        war: '**/*.war'
+                    )
+                }
+            }
         }
     }
+}
+
+def deployToTomcat(Map params) {
+    deploy adapters: [
+        tomcat9 (
+            credentialsId: params.credentialsId,
+            path: params.path ?: '',
+            url: params.url
+        )
+    ],
+    contextPath: params.contextPath,
+    onFailure: params.onFailure ?: 'false',
+    war: params.war
 }
