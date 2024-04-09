@@ -29,17 +29,20 @@ pipeline {
             when {
                 branch 'main'
             }
-              steps {
-                         echo "deploy stage"
-                          deploy adapters: [tomcat9 (
-                                     credentialsId: 'Tomcat_deploy',
-                                      path: '',
-                                       url: 'http://57.151.123.161:8088/'
-                                      )],
-                                      contextPath: 'test',
-                                       onFailure: 'false',
-                                          war: '**/*.war'
-                                  }
+            steps {
+                script {
+                    echo "Deploying to Production"
+                    // Assuming you have the 'Tomcat_deploy' credentials configured in Jenkins
+                    // Adjust the URL, context path, and war file path according to your setup
+                    deploy adapters: [tomcat9(
+                        credentialsId: 'Tomcat_deploy',
+                        url: 'http://57.151.123.161:8088/',
+                        war: '**/*.war',
+                        contextPath: 'test'
+                    )],
+                    onFailure: 'false'
+                }
+            }
         }
     }
 }
