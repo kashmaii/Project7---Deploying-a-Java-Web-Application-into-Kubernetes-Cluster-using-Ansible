@@ -6,7 +6,7 @@ pipeline {
             steps {
                 script {
                     // Build and test steps for both branches
-                    sh 'mvn clean package'
+                    sh 'mvn clean build'
                 }
             }
         }
@@ -18,10 +18,12 @@ pipeline {
             steps {
                 script {
                     // Install stage for the development branch
-                    sh 'mvn install'
+                    sh 'mvn clean install'
                 }
             }
-            
+        }
+        
+        stage('Deploy to Production') {
             when {
                 branch 'main'
             }
