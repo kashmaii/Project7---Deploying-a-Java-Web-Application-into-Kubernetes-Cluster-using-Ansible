@@ -1,79 +1,48 @@
 pipeline {
     agent any
-    environment {
-      PATH = "$PATH:/opt/apache-maven-3.9.1/bin"
-    }
-    
+
     stages {
-
-        stage('CLEAN WORKSPACE') {
+        stage('Build and Test') {
             steps {
-                cleanWs()
-            }
-        }
-
-        stage('CODE CHECKOUT') {
-            steps {
-                git branch: 'main', url: 'https://github.com/iamsaikishore/Project7---Deploying-a-Java-Web-Application-into-Kubernetes-Cluster-using-Ansible.git'
+                script {
+                    // Build and test steps for both branches
+                    sh 'mvn clean package'
+                }
             }
         }
         
-        stage('MODIFIED IMAGE TAG') {
+        stage('Install or Deploy') {
+            when {
+                branch 'development'
+            }
             steps {
-                
-                sh '''
-                   sed "s/image-name:latest/$JOB_NAME:v1.$BUILD_ID/g" playbooks/dep_svc.yml
-                   sed -i "s/image-name:latest/$JOB_NAME:v1.$BUILD_ID/g" playbooks/dep_svc.yml
-                   sed -i "s/IMAGE_NAME/$JOB_NAME:v1.$BUILD_ID/g" webapp/src/main/webapp/index.jsp
-                   '''
-            }            
-        }
-        
-        stage('BUILD') {
-            steps {
-                sh 'mvn clean install package'
+                script {
+                    // Install stage for the development branch
+                    // Assuming you have configured Tomcat on the Jenkins node
+                    // Adjust the deployment steps according to your setup
+                    sh 'mvn install'
+                }
             }
         }
         
-        stage('SONAR SCANNER') {
-            environment {
-            sonar_token = credentials('SONAR_TOKEN')
+        stage('Deploy to Production') {
+            when {
+                branch 'main'
             }
             steps {
-                sh 'mvn sonar:sonar -Dsonar.projectName=$JOB_NAME \
-                    -Dsonar.projectKey=$JOB_NAME \
-                    -Dsonar.host.url=https://sonar.kishq.co \
-                    -Dsonar.token=$sonar_token'
+                script {
+                    echo "Deploying to Production"
+                    // Assuming you have the 'Tomcat_deploy' credentials configured in Jenkins
+                    // Adjust the URL, context path, and war file path according to your setup
+                    deploy adapters: [tomcat9(
+                        credentialsId: 'Tomcat_deploy',
+                        url: 'http://57.151.123.161:8088/',
+                        war: '**/*.war',
+                        contextPath: 'test'
+                    )],
+                    onFailure: 'false'
+                }
             }
         }
-        
-        stage('COPY JAR & DOCKERFILE') {
-            steps {
-                sh 'ansible-playbook playbooks/create_directory.yml'
-            }
-        }
-        
-        stage('PUSH IMAGE ON DOCKERHUB') {
-            environment {
-            dockerhub_user = credentials('DOCKERHUB_USER')            
-            dockerhub_pass = credentials('DOCKERHUB_PASS')
-            }    
-            steps {
-                
-                sh 'ansible-playbook playbooks/push_dockerhub.yml \
-                    --extra-vars "JOB_NAME=$JOB_NAME" \
-                    --extra-vars "BUILD_ID=$BUILD_ID" \
-                    --extra-vars "dockerhub_user=$dockerhub_user" \
-                    --extra-vars "dockerhub_pass=$dockerhub_pass"'              
-            }
-        }
-        
-        stage('DEPLOYMENT ON K8S') {
-            steps {
-                sh 'ansible-playbook playbooks/create_pod_on_eks.yml \
-                    --extra-vars "JOB_NAME=$JOB_NAME"'
-            }            
-        }
-        
     }
 }
