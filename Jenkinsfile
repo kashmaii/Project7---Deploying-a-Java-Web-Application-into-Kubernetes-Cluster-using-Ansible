@@ -35,12 +35,11 @@ pipeline {
                     // Assuming you have the 'Tomcat_deploy' credentials configured in Jenkins
                     // Adjust the URL, context path, and war file path according to your setup
                     deploy adapters: [tomcat10(
-    credentialsId: 'Tomcat_deploy',
-    url: 'http://57.151.123.161:8088/',
-    war: '**/*.war',
-    contextPath: 'test'
-)],
-
+                        credentialsId: 'Tomcat_deploy',
+                        url: 'http://57.151.123.161:8088/',
+                        war: '**/*.war',
+                        contextPath: 'test'
+                    )]
                 }
             }
         }
