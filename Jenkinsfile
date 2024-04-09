@@ -6,7 +6,7 @@ pipeline {
             steps {
                 script {
                     // Build and test steps for both branches
-                    sh 'mvn clean build'
+                    sh 'mvn clean package'
                 }
             }
         }
@@ -18,7 +18,9 @@ pipeline {
             steps {
                 script {
                     // Install stage for the development branch
-                    sh 'mvn clean install'
+                    // Assuming you have configured Tomcat on the Jenkins node
+                    // Adjust the deployment steps according to your setup
+                    sh 'mvn install'
                 }
             }
         }
