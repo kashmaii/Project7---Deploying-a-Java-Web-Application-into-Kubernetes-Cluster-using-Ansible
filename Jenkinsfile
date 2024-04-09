@@ -25,20 +25,21 @@ pipeline {
             }
         }
         
-stage('Deploy to Production') {
-    when {
-        branch 'main'
-    }
-    steps {
-        script {
-            def tomcatURL = 'http://57.151.123.161:8080/'
-            def credentialsId = 'tomcat_deploy_credentials'
-            def contextPath = 'test'
-            def warFilePath = '**/*.war'
+        stage('Deploy to Production') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    def tomcatURL = 'http://57.151.123.161:8080/'
+                    def credentialsId = 'tomcat_deploy_credentials'
+                    def contextPath = 'test'
+                    def warFilePath = '**/*.war'
 
-            def tomcatServer = Tomcat.server(credentialsId)
-            tomcatServer.deploy war: warFilePath, path: contextPath, url: tomcatURL
+                    def tomcatServer = Tomcat.server(credentialsId)
+                    tomcatServer.deploy war: warFilePath, path: contextPath, url: tomcatURL
+                }
+            }
         }
     }
 }
-
