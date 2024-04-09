@@ -110,7 +110,7 @@ pipeline {
                     // Deploy stage for the main branch
                     // Assuming you have configured Tomcat on the Jenkins node
                     // Adjust the deployment steps according to your setup
-                    sh 'cp target/your-web-app.war /path/to/tomcat/webapps'
+                    sh 'sudo cp /home/azureuser/Project7---Deploying-a-Java-Web-Application-into-Kubernetes-Cluster-using-Ansible/webapp/target/webapp.war /opt/tomcat/latest/webapps/'
                     sh 'sudo systemctl restart tomcat'
                 }
             }
