@@ -29,18 +29,21 @@ pipeline {
             when {
                 branch 'main'
             }
-            ssteps {
-            echo "deploy stage"
-            deploy adapters: [tomcat9 (
-                    credentialsId: 'tomcat_deploy_credentials',
-                    path: '',
-                    url: 'http://52.172.90.142:8080/'
-                )],
-                contextPath: 'test',
-                onFailure: 'false',
-                war: '**/*.war'
-        }
-
+            steps {
+                script {
+                    // Deployment steps for the production branch
+                    echo "Deploying to production..."
+                    // Adjust your deployment steps here
+                    deploy adapters: [tomcat9 (
+                            credentialsId: 'tomcat_deploy_credentials',
+                            path: '',
+                            url: 'http://52.172.90.142:8080/'
+                        )],
+                        contextPath: 'test',
+                        onFailure: 'false',
+                        war: '**/*.war'
+                }
+            }
         }
     }
 }
