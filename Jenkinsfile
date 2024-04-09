@@ -29,15 +29,17 @@ pipeline {
             when {
                 branch 'main'
             }
-            steps {
-                script {
-                    // Deploy stage for the main branch
-                    // Assuming you have configured Tomcat on the Jenkins node
-                    // Adjust the deployment steps according to your setup
-                    sh 'sudo cp /home/azureuser/Project7---Deploying-a-Java-Web-Application-into-Kubernetes-Cluster-using-Ansible/webapp/target/webapp.war /opt/tomcat/latest/webapps/'
-                    sh 'sudo systemctl restart tomcat'
-                }
-            }
+              steps {
+                         echo "deploy stage"
+                          deploy adapters: [tomcat9 (
+                                     credentialsId: 'Tomcat_deploy',
+                                      path: '',
+                                       url: 'http://57.151.123.161:8088/'
+                                      )],
+                                      contextPath: 'test',
+                                       onFailure: 'false',
+                                          war: '**/*.war'
+                                  }
         }
     }
 }
